@@ -1,0 +1,23 @@
+import cv2
+plate_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_russian_plate_number.xml')
+
+image_path = r'C:\Users\Admin\Downloads\carn.jpg'  
+output_path = r'C:\Users\Admin\Downloads\blurred_car.jpg' 
+image = cv2.imread(image_path)
+if image is None:
+    print(f"Ошибка загрузки изображения: {image_path}")
+else:
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    plates = plate_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40))
+
+    for (x, y, w, h) in plates:
+        plate_roi = image[y:y+h, x:x+w] 
+        blurred_plate = cv2.GaussianBlur(plate_roi, (51, 51), 30)  
+        image[y:y+h, x:x+w] = blurred_plate  
+    cv2.imwrite(output_path, image)
+    print(f"Результат сохранен: {output_path}")
+
+    cv2.imshow('Blurred Plates', image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
